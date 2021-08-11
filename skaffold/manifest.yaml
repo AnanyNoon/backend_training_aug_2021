@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-python-boilerplate
+  labels:
+    app: backend-python-boilerplate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-python-boilerplate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: backend-python-boilerplate
+      labels:
+        app: backend-python-boilerplate
+    spec:
+      restartPolicy: Always
+      volumes:
+        - name: backend-python-boilerplate-credentials
+          hostPath:
+            path: /private/noon/credentials
+      containers:
+      - image: backend-python-boilerplate
+        name: backend-python-boilerplate
+        imagePullPolicy: IfNotPresent
+        command: ["/start-reload.sh"]
+        tty: true
+        stdin: true
+        envFrom:
+        - configMapRef:
+            name: config-com
+        volumeMounts:
+          - name: backend-python-boilerplate-credentials
+            mountPath: /credentials/
+            readOnly: true
+        env:
+        - name: ENV
+          value: dev
+        - name: FASTAPI_DEBUG
+          value: "1"
+        - name: PORT
+          value: "8080"
+        - name: ENGINE_foo
+          value: "root:root@mysql.default.svc.cluster.local/foo"
+        - name: ENGINE_baz
+          value: "root:root@mysql.default.svc.cluster.local/baz"
+        - name: ENGINE_test
+          value: "root:root@mysql.default.svc.cluster.local/"
+        - name: SECRET_KEY
+          value: abc1212313
+        - name: SENTRY_DSN
+          value:
+        - name: APP_MODULE
+          value: appfoo.web:app
+        - name: PYTEST_ADDOPTS
+          value: "-x -p no:warnings"
+      terminationGracePeriodSeconds: 1
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: backend-python-boilerplate
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/rewrite-target: "/"
+spec:
+  tls:
+    - hosts:
+        - backend-python-boilerplate.noondv.com
+  rules:
+  - host: backend-python-boilerplate.noondv.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: backend-python-boilerplate
+          servicePort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-python-boilerplate
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: backend-python-boilerplate
