@@ -19,7 +19,7 @@ def client():
 def engine_baz():
     from libutil import util
     engine = util.get_engine('baz')
-    assert engine.url.database == f'testbaz'
+    assert engine.url.database == f'baz'
     import libbaz
     libbaz.models.tables.create_all()
     return engine

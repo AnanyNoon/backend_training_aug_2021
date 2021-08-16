@@ -19,7 +19,7 @@ def client():
 def engine_bar():
     from libutil import util
     engine = util.get_engine('bar')
-    assert engine.url.database == f'testbar'
+    assert engine.url.database == f'bar'
     import libbar
     libbar.models.tables.create_all()
     return engine
@@ -28,7 +28,7 @@ def engine_bar():
 def engine_baz():
     from libutil import util
     engine = util.get_engine('baz')
-    assert engine.url.database == f'testbaz'
+    assert engine.url.database == f'baz'
     import libbaz
     libbaz.models.tables.create_all()
     return engine

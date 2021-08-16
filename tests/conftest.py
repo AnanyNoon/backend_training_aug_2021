@@ -22,10 +22,10 @@ def setup_engine_env(*engine_names):
     os.environ[f'ENGINE_test'] = ENGINE_test + '/'
     os.environ['TESTING'] = 'pytest'
     for engine_name in engine_names:
-        os.environ[f'ENGINE_{engine_name}'] = ENGINE_test + '/test' + engine_name
+        os.environ[f'ENGINE_{engine_name}'] = ENGINE_test + '/' + engine_name
         with util.get_engine('test').connect() as conn:
-            conn.execute(f'DROP DATABASE IF EXISTS test{engine_name}')
-            conn.execute(f'CREATE DATABASE test{engine_name}')
+            conn.execute(f'DROP DATABASE IF EXISTS {engine_name}')
+            conn.execute(f'CREATE DATABASE {engine_name}')
     assert os.getenv('ENV') in ('dev', 'staging'), 'must be dev/stg'
 
 setup_engine_env('foo', 'bar', 'baz')
